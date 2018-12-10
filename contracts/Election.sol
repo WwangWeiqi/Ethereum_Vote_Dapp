@@ -17,6 +17,12 @@ contract Election {
 	//Store candidate count
 	uint public candidatesCount;
 
+	//vote event 
+	event votedEvent(
+		uint indexed _candidateId
+	);
+	
+
 	function Election() public{
 		addCandidate('Candidate1');
 		addCandidate('Candidate2');
@@ -39,5 +45,9 @@ contract Election {
 
 		//update Candidte voteCount
 		candidates[_candidateId].voteCount++;
+
+		//trigger event 
+		votedEvent(_candidateId);
+		
 	}
 }
