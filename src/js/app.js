@@ -26,8 +26,7 @@ App = {
       App.contracts.Election.setProvider(App.web3Provider);
       return App.render();
     })
-
-    
+  
   },
 
   render: function() {
@@ -52,6 +51,7 @@ App = {
       return electionInstance.candidatesCount();
     }).then(function(candidatesCount){
       var candidatesResults = $('#candidatesResults');
+      var candidatesSelect = $('#candidatesSelect')
       candidatesResults.empty();
 
       for (var i = 1; i <= candidatesCount; i ++) {
@@ -62,16 +62,35 @@ App = {
 
           var candidateTemplate = "<tr><th>" + id + "</th><td>" + name + "</td><td>" + voteCount + "</td></tr>";
           candidatesResults.append(candidateTemplate);
-        })
-      }
 
+           var candidateOption = "<option value='" + id + "'>" + name + "</option>";
+          candidatesSelect.append(candidateOption);
+        });
+      }
+      return electionInstance.voters(App.account);
+    }).then(function(hasVoted){
+      if (hasVoted) {
+        $('form').hide();
+      }
       loader.hide();
       content.show();
     }).catch(function(err){
       console.warn(err);
     });
-
   },
+
+  castVote: function(){
+    var candidateId = $('#candidatesSelect').val();
+    App.contracts.Election.deployed().then(function(instance){
+      electionInstance = instance;
+      return electionInstance.vote(candidateId,{from:App.account});
+    }).then(function(result){
+      $('#loader').show();
+      $('#content').hide();
+    }).catch(function(err){
+      console.error(err);
+    })
+  }
 };
 
 
